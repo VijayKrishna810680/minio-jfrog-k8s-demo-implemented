@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-dashboard
+  template:
+    metadata:
+      labels:
+        app: ai-dashboard
+    spec:
+      containers:
+      - name: ai-dashboard
+        image: minio-jfrog-k8s-demo-implemented-ai-dashboard:latest
+        imagePullPolicy: Never   # uses your local image
+        ports:
+        - containerPort: 8501
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-dashboard-service
+spec:
+  selector:
+    app: ai-dashboard
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8501
+  type: LoadBalancer
