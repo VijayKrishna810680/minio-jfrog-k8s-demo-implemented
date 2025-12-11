@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-mycluster
+  namespace: default
+spec:
+  secretName: wildcard-mycluster-tls
+  commonName: "*.mycluster.local"
+  dnsNames:
+    - "*.mycluster.local"
+  issuerRef:
+    name: internal-ca-issuer
+    kind: ClusterIssuer
+  duration: 2160h        # 90 days
+  renewBefore: 360h      # 15 days

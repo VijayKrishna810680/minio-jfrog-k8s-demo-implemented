@@ -1,0 +1,47 @@
+apiVersion: apps/v1                     # Kubernetes API version for Deployment objects
+kind: Deployment                        # We are creating a Deployment
+metadata:
+  name: minio                           # Name of the Deployment
+  namespace: demo-minio-jfrog           # Namespace where MinIO will be deployed
+  labels:
+    app: minio                          # Label used to identify MinIO resources
+spec:
+  replicas: 1                            # Run only one MinIO pod
+  selector:
+    matchLabels:
+      app: minio                        # Deployment manages pods with this label
+  template:
+    metadata:
+      labels:
+        app: minio                      # Label inside the pod template (must match selector)
+    spec:
+      containers:
+        - name: minio
+          image: quay.io/minio/minio:latest     # MinIO official image
+          args:
+            - server                            # Start MinIO in server mode
+            - /data                             # Use /data directory to store objects
+            - "--console-address"               # Enable MinIO Web Console
+            - ":9001"                           # Web Console will run on port 9001
+          env:
+            - name: MINIO_ROOT_USER             # Correct env variable for MinIO admin username
+              valueFrom:
+                secretKeyRef:                   # Value comes from Kubernetes Secret
+                  name: minio-secret            # Secret name (minio-secret.yaml)
+                  key: accesskey                # Use "accesskey" from the secret
+            - name: MINIO_ROOT_PASSWORD         # Correct env variable for MinIO admin password
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret            # Same secret as above
+                  key: secretkey                # Use "secretkey" from the secret
+          ports:
+            - name: api
+              containerPort: 9000               # Port exposed for MinIO S3 API
+            - name: console
+              containerPort: 9001               # Port exposed for MinIO Web Console
+          volumeMounts:
+            - name: data
+              mountPath: /data                  # Attach the volume to /data inside container
+      volumes:
+        - name: data
+          emptyDir: {}                          # Temporary storage (deleted if pod restarts)

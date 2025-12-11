@@ -1,0 +1,11 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-demo-app-config
+  namespace: demo-minio-jfrog
+data:
+  MINIO_ENDPOINT: "http://minio.demo-minio-jfrog.svc.cluster.local:9000"
+  MINIO_BUCKET: "demo-bucket"
+  MINIO_ACCESS_KEY: "minioadmin"
+  MINIO_SECRET_KEY: "minioadmin123"

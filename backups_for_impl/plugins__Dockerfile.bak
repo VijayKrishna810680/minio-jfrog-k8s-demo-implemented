@@ -1,0 +1,7 @@
+# Use official Python image
+FROM python:3.11-slim
+WORKDIR /plugins
+COPY . .
+RUN pip install --no-cache-dir fastapi uvicorn
+EXPOSE 8181
+CMD ["uvicorn", "plugin_manager:router", "--host", "0.0.0.0", "--port", "8181"]

@@ -1,0 +1,47 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-demo-app
+  namespace: demo-minio-jfrog
+  labels:
+    app: minio-demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-demo-app
+  template:
+    metadata:
+      labels:
+        app: minio-demo-app
+    spec:
+      containers:
+        - name: minio-demo-app
+          image: myregistry.example.com/project/app:latest
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: minio-demo-app-config
+          ports:
+            - name: http
+              containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 20

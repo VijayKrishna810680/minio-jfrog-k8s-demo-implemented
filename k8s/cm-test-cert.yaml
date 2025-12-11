@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: example-com-cert
+  namespace: default
+spec:
+  secretName: example-com-tls
+  commonName: example.com
+  dnsNames:
+    - example.com
+  issuerRef:
+    name: internal-ca-issuer
+    kind: ClusterIssuer
+  duration: 2160h        # 90 days
+  renewBefore: 360h      # 15 days before expiry

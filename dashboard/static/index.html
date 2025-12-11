@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Chart Board Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        #chart { width: 100%; max-width: 700px; height: 400px; }
+    </style>
+</head>
+<body>
+    <h1>AI Chart Board Dashboard</h1>
+    <div>
+        <h2>Files in MinIO</h2>
+        <ul id="file-list"></ul>
+    </div>
+    <div>
+        <h2>AI Analytics (File Upload Trends)</h2>
+        <div id="chart"></div>
+    </div>
+    <script>
+        // Fetch file list
+        fetch('/api/files').then(r => r.json()).then(data => {
+            const ul = document.getElementById('file-list');
+            (data.files || []).forEach(f => {
+                const li = document.createElement('li');
+                li.textContent = f;
+                ul.appendChild(li);
+            });
+        });
+        // Fetch AI analytics
+        fetch('/api/ai-analytics').then(r => r.json()).then(data => {
+            const future = data.future || [];
+            const trace = {
+                x: [10, 11, 12, 13, 14],
+                y: future,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Predicted Uploads'
+            };
+            Plotly.newPlot('chart', [trace], { title: 'Predicted File Uploads (AI)' });
+        });
+    </script>
+</body>
+</html>

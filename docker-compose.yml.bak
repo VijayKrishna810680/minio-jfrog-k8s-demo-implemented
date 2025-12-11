@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./app/Dockerfile
+    image: minio-jfrog-k8s-demo-app:latest
+    ports:
+      - "8081:80"
+  services:
+  ai-dashboard:
+    build:
+      context: .
+      dockerfile: ai-dashboard/Dockerfile
+    ports:
+      - "8501:8501"
+    container_name: ai-dashboard
+    restart: unless-stopped
+    # ← add any environment, volumes, etc. here if you had them
+    # environment:
+    #   - SOME_VAR=value
+    # volumes:
+    #   - ./some-data:/app/data
+    volumes:
+      - ./dashboard/static:/dashboard/static
+  monitoring:
+    build:
+      context: ./monitoring
+      dockerfile: Dockerfile
+    image: minio-jfrog-k8s-demo-monitoring:latest
+    ports:
+      - "9090:9090"
+  plugin-manager:
+    build:
+      context: ./plugins
+      dockerfile: Dockerfile
+    image: minio-jfrog-k8s-demo-plugin-manager:latest
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./plugins:/plugins
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address :9001
+
+ai:
+  build:
+    context: .
+    dockerfile: ./ai/Dockerfile
+  image: minio-jfrog-k8s-demo-ai:latest
+  ports:
+    - "5000:5000"
+  restart: unless-stopped
